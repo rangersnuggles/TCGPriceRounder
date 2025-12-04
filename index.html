@@ -295,7 +295,7 @@
 <body>
     <div class="container">
         <h1>TCGPlayer Price Rounder</h1>
-        <p class="subtitle">Round all prices up to the nearest $0.25</p>
+        <p class="subtitle">Round all prices up to the nearest $0.25 (minimum $0.50)</p>
 
         <div class="upload-area" id="uploadArea">
             <input type="file" id="fileInput" accept=".csv">
@@ -476,6 +476,11 @@
         }
 
         function roundUpToQuarter(price) {
+            // If price is under $0.50, round to $0.50
+            if (price < 0.50) {
+                return 0.50;
+            }
+            // Otherwise round up to nearest $0.25
             return Math.ceil(price * 4) / 4;
         }
 
@@ -499,7 +504,8 @@
                 let originalTotal = 0;
                 let roundedTotal = 0;
                 const priceRanges = {
-                    '$0.25 - $0.99': 0,
+                    '$0.50': 0,
+                    '$0.75 - $0.99': 0,
                     '$1.00 - $4.99': 0,
                     '$5.00 - $9.99': 0,
                     '$10.00 - $19.99': 0,
@@ -516,7 +522,8 @@
                     roundedTotal += rounded * quantity;
                     
                     // Categorize prices
-                    if (rounded >= 0.25 && rounded <= 0.99) priceRanges['$0.25 - $0.99'] += quantity;
+                    if (rounded === 0.50) priceRanges['$0.50'] += quantity;
+                    else if (rounded >= 0.75 && rounded <= 0.99) priceRanges['$0.75 - $0.99'] += quantity;
                     else if (rounded >= 1 && rounded <= 4.99) priceRanges['$1.00 - $4.99'] += quantity;
                     else if (rounded >= 5 && rounded <= 9.99) priceRanges['$5.00 - $9.99'] += quantity;
                     else if (rounded >= 10 && rounded <= 19.99) priceRanges['$10.00 - $19.99'] += quantity;
